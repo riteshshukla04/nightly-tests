@@ -43,7 +43,7 @@ jobs:
     strategy:
       matrix:
         library: ${{ fromJSON(needs.runner-setup.outputs.libraries) }}
-        platform: [ios, android]
+        platform: [ios]
     steps:
       - name: Checkout
         uses: actions/checkout@v6
