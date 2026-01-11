@@ -38,7 +38,14 @@ runs:
           echo "⚠️  Warning: Patch file not found: ${{ inputs.patch-file }}"
           exit 1
         fi
-    
+    - name: Apply RN Core Patch
+      shell: bash
+      run: |
+        cd /tmp/RNApp
+        node "$GITHUB_WORKSPACE/scripts/apply-patch.js" "$GITHUB_WORKSPACE/patches/rncore.patch"
+        echo "✅ RN Core patch applied successfully"
+
+        
     - name: Add library with retry
       uses: nick-fields/retry@v3
       with:

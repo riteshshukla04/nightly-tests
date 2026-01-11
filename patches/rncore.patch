@@ -1,0 +1,117 @@
+diff --git a/ios/RNApp.xcodeproj/project.pbxproj b/ios/RNApp.xcodeproj/project.pbxproj
+index 3a14200..79a9fc1 100644
+--- a/ios/RNApp.xcodeproj/project.pbxproj
++++ b/ios/RNApp.xcodeproj/project.pbxproj
+@@ -189,10 +189,14 @@
+ 			inputFileListPaths = (
+ 				"${PODS_ROOT}/Target Support Files/Pods-RNApp/Pods-RNApp-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+ 			);
++			inputPaths = (
++			);
+ 			name = "[CP] Embed Pods Frameworks";
+ 			outputFileListPaths = (
+ 				"${PODS_ROOT}/Target Support Files/Pods-RNApp/Pods-RNApp-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+ 			);
++			outputPaths = (
++			);
+ 			runOnlyForDeploymentPostprocessing = 0;
+ 			shellPath = /bin/sh;
+ 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RNApp/Pods-RNApp-frameworks.sh\"\n";
+@@ -228,10 +232,14 @@
+ 			inputFileListPaths = (
+ 				"${PODS_ROOT}/Target Support Files/Pods-RNApp/Pods-RNApp-resources-${CONFIGURATION}-input-files.xcfilelist",
+ 			);
++			inputPaths = (
++			);
+ 			name = "[CP] Copy Pods Resources";
+ 			outputFileListPaths = (
+ 				"${PODS_ROOT}/Target Support Files/Pods-RNApp/Pods-RNApp-resources-${CONFIGURATION}-output-files.xcfilelist",
+ 			);
++			outputPaths = (
++			);
+ 			runOnlyForDeploymentPostprocessing = 0;
+ 			shellPath = /bin/sh;
+ 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RNApp/Pods-RNApp-resources.sh\"\n";
+@@ -274,6 +282,7 @@
+ 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+ 				PRODUCT_NAME = RNApp;
+ 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
++				SWIFT_OBJC_INTEROP_MODE = objcxx;
+ 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+ 				SWIFT_VERSION = 5.0;
+ 				TARGETED_DEVICE_FAMILY = "1,2";
+@@ -303,6 +312,7 @@
+ 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+ 				PRODUCT_NAME = RNApp;
+ 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
++				SWIFT_OBJC_INTEROP_MODE = objcxx;
+ 				SWIFT_VERSION = 5.0;
+ 				TARGETED_DEVICE_FAMILY = "1,2";
+ 				VERSIONING_SYSTEM = "apple-generic";
+diff --git a/package.json b/package.json
+index 4929ebe..566ace0 100644
+--- a/package.json
++++ b/package.json
+@@ -7,12 +7,14 @@
+     "ios": "react-native run-ios",
+     "lint": "eslint .",
+     "start": "react-native start",
+-    "test": "jest"
++    "test": "jest",
++    "postinstall": "patch-package"
+   },
+   "dependencies": {
++    "@react-native/new-app-screen": "nightly",
++    "patch-package": "^8.0.1",
+     "react": "19.2.3",
+     "react-native": "nightly",
+-    "@react-native/new-app-screen": "nightly",
+     "react-native-safe-area-context": "^5.5.2"
+   },
+   "devDependencies": {
+@@ -38,4 +40,4 @@
+   "engines": {
+     "node": ">= 22.11.0"
+   }
+-}
+\ No newline at end of file
++}
+diff --git a/patches/react-native+0.85.0-nightly-20260111-07c0539cb.patch b/patches/react-native+0.85.0-nightly-20260111-07c0539cb.patch
+new file mode 100644
+index 0000000..d10fccc
+--- /dev/null
++++ b/patches/react-native+0.85.0-nightly-20260111-07c0539cb.patch
+@@ -0,0 +1,33 @@
++diff --git a/node_modules/react-native/scripts/ios-configure-glog.sh b/node_modules/react-native/scripts/ios-configure-glog.sh
++index 6571abb..dc5b882 100755
++--- a/node_modules/react-native/scripts/ios-configure-glog.sh
+++++ b/node_modules/react-native/scripts/ios-configure-glog.sh
++@@ -102,3 +102,15 @@ cp -f src/glog/logging.h "$EXPORTED_INCLUDE_DIR/"
++ cp -f src/glog/raw_logging.h "$EXPORTED_INCLUDE_DIR/"
++ cp -f src/glog/stl_logging.h "$EXPORTED_INCLUDE_DIR/"
++ cp -f src/glog/vlog_is_on.h "$EXPORTED_INCLUDE_DIR/"
+++
+++
+++cat > src/glog/module.modulemap << 'MODULEMAP'
+++module glog {
+++    textual header "log_severity.h"
+++    textual header "logging.h"
+++    textual header "raw_logging.h"
+++    textual header "stl_logging.h"
+++    textual header "vlog_is_on.h"
+++    export *
+++}
+++MODULEMAP
++\ No newline at end of file
++diff --git a/node_modules/react-native/third-party-podspecs/glog.podspec b/node_modules/react-native/third-party-podspecs/glog.podspec
++index af76680..e4eb90d 100644
++--- a/node_modules/react-native/third-party-podspecs/glog.podspec
+++++ b/node_modules/react-native/third-party-podspecs/glog.podspec
++@@ -33,6 +33,7 @@ Pod::Spec.new do |spec|
++   spec.exclude_files       = "src/windows/**/*"
++   spec.compiler_flags      = '-Wno-shorten-64-to-32'
++   spec.resource_bundles = {'glog_privacy' => 'glog/PrivacyInfo.xcprivacy'}
+++  spec.module_map = 'src/glog/module.modulemap'
++ 
++   spec.pod_target_xcconfig = {
++     "USE_HEADERMAP" => "NO",

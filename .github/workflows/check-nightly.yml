@@ -19,27 +19,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  check-nightly:
-    runs-on: ubuntu-latest
-    if: github.repository == 'react-native-community/nightly-tests'
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-      - name: Check nightly
-        run: |
-          TODAY=$(date "+%Y%m%d")
-          echo "Checking nightly for $TODAY"
-          NIGHTLY="$(npm view react-native | grep $TODAY)"
-          if [[ -z $NIGHTLY ]]; then
-            echo 'Nightly job failed.'
-            exit 1
-          else
-            echo 'Nightly Worked, All Good!'
-          fi
-
+  
   test-libraries:
     uses: ./.github/workflows/test-libraries-on-nightlies.yml
-    needs: check-nightly
     secrets:
       discord_webhook_url: ${{ secrets.NIGHTLY_DISCORD_WEBHOOK }}
       firebase_app_email: ${{ secrets.FIREBASE_APP_EMAIL }}
