@@ -83,7 +83,8 @@ runs:
           xcodebuild build \
             -workspace RNApp.xcworkspace \
             -scheme RNApp \
-            -sdk iphonesimulator
+            -sdk iphonesimulator \
+            -configuration Release
         on_retry_command: |
           echo "Cleaning up for iOS retry..."
           cd /tmp/RNApp/ios
